@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 
-class DistressDialog(private val c: Activity, private val context:Context) : Dialog(c), View.OnClickListener {
+class IncidentDialog(private val c: Activity, private val context:Context) : Dialog(c), View.OnClickListener {
     lateinit var cardView: CardView
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -25,11 +25,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.animation.PathInterpolatorCompat
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
+import com.google.firebase.messaging.messaging
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.common.MapboxOptions
@@ -83,6 +87,7 @@ class MainActivity : AppCompatActivity() {
     private var documents: List<DocumentSnapshot>? = null
     private var listener: ListenerRegistration? = null
     var zoom: Double = 6.0;
+    private lateinit var fcmToken: String
 
     private val enableLocationLauncher = registerForActivityResult<Intent, ActivityResult>(
         ActivityResultContracts.StartActivityForResult()
@@ -112,6 +117,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                // TODO: display an educational UI explaining to the user the features that will be enabled
+                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
+                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
+                //       If the user selects "No thanks," allow the user to continue without notifications.
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // FCM SDK (and your app) can post notifications.
+        } else {
+            // TODO: Inform user that that your app will not show notifications.
+        }
+    }
+
+    fun sendFCMMessage(message: String) {
+        Thread {
+            try {
+                // Construct the FCM message
+                val message = mapOf(
+                    "to" to fcmToken,
+                    "title" to "Your Notification Title",
+                    "body" to message
+                )
+
+                // Send the FCM message
+                val response = FirebaseMessaging.getInstance().send(
+                    RemoteMessage.Builder(fcmToken).setData(message).build()
+                )
+
+                // Log the message ID and response
+                Log.d("FCM Message", "Successfully sent message: $response")
+            } catch (e: Exception) {
+                Log.e("FCM Message", "Error sending message", e)
+            }
+        }.start()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -119,6 +176,16 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
             finish()
+        }
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                Log.d("FCM Token", "Token: $token")
+                fcmToken = token
+            } else {
+                Log.e("FCM Token", "Error getting token", task.exception)
+            }
         }
 
         setContentView(R.layout.activity_main)
@@ -190,9 +257,11 @@ class MainActivity : AppCompatActivity() {
         )
         mapView.mapboxMap.loadStyle(Style.SATELLITE)
 
+        permissionsManager = PermissionsManager(permissionsListener)
+        askNotificationPermission()
+//        DistressMessagingService().generateNotification("hi", "ho")
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
         } else {
-            permissionsManager = PermissionsManager(permissionsListener)
             permissionsManager.requestLocationPermissions(this)
         }
 
@@ -449,7 +518,7 @@ class MainActivity : AppCompatActivity() {
                 }
 //                Toast.makeText(this@MainActivity, secondsDifference.toString(), Toast.LENGTH_SHORT)
 //                    .show()
-                if (secondsDifference <= 2 * 60 * 60) {
+                if (secondsDifference <= 2 * 60 ) {
                     addAnnotationToMap(
                         data["longitude"].toString().toDouble(),
                         data["latitude"].toString().toDouble(),
