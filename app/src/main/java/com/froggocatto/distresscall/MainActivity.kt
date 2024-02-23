@@ -1,5 +1,6 @@
 package com.froggocatto.distresscall
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -237,9 +238,21 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun startBackgroundService() {
-        // Start the BackgroundService
         val serviceIntent = Intent(this, BackgroundService::class.java)
-        startService(serviceIntent)
+
+        // Check if BackgroundService is already running
+        if (!isServiceRunning(BackgroundService::class.java)) {
+            startService(serviceIntent)
+        }
+    }
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun initializeMapBox() {
@@ -259,7 +272,6 @@ class MainActivity : AppCompatActivity() {
 
         permissionsManager = PermissionsManager(permissionsListener)
         askNotificationPermission()
-//        DistressMessagingService().generateNotification("hi", "ho")
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
         } else {
             permissionsManager.requestLocationPermissions(this)
@@ -267,10 +279,9 @@ class MainActivity : AppCompatActivity() {
 
         val coroutineScope = CoroutineScope(Dispatchers.Main)
         coroutineScope.launch {
-            delay(1000) // 1000 milliseconds = 1 second
+            delay(1000)
             getLocation()
         }
-//        goToRegister()
     }
 
     private fun getLocation() {
@@ -286,10 +297,6 @@ class MainActivity : AppCompatActivity() {
             location.locationPuck = createDefault2DPuck(withBearing = true)
             location.enabled = true
             location.puckBearing = PuckBearing.HEADING
-//            viewport.transitionTo(
-//                targetState = viewport.makeFollowPuckViewportState(),
-//                transition = viewport.makeDefaultViewportTransition()
-//            )
             val currentLocation = getCurrentLocation() ?: return
             val target = cameraOptions {
                 center(Point.fromLngLat(currentLocation.longitude, currentLocation.latitude))
@@ -389,17 +396,6 @@ class MainActivity : AppCompatActivity() {
         ) {
             startBackgroundService()
         }
-    }
-
-    private fun goToRegister() {
-        val intent = Intent(this, Register::class.java);
-        startActivity(intent)
-    }
-
-    companion object {
-        private const val BLUE_ICON_ID = "blue"
-        private const val SOURCE_ID = "source_id"
-        private const val LAYER_ID = "layer_id"
     }
 
     public fun addAnnotationToMap(

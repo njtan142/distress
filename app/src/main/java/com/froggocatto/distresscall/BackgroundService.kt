@@ -69,9 +69,7 @@ class BackgroundService : Service() {
     fun generateNotification(title: String, message: String) {
         val notificationId = 0
 
-        // Check if notification with ID 0 is already active
         if (isNotificationActive(notificationId)) {
-            // Remove the existing notification
             removeNotification(notificationId)
         }
         val intent = Intent(this, MainActivity::class.java)
