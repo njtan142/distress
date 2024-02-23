@@ -58,8 +58,8 @@ class BackgroundService : Service() {
         )
 
         val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Foreground Service")
-            .setContentText("Running in the background")
+            .setContentTitle("Distress Alert Monitoring")
+            .setContentText("Keeping an eye to incidents...")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pendingIntent)
             .build()
