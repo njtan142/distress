@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.cardview.widget.CardView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -119,14 +120,15 @@ class DistressDialog(private val c: Activity, private val context:Context) : Dia
             "longitude" to location.longitude,
             "distress" to distress,
             "timestamp" to FieldValue.serverTimestamp(),
+            "reporter" to FirebaseAuth.getInstance().currentUser!!.uid
         )
         (context as MainActivity).sendFCMMessage(distress)
 
         colRef.document().set(data).addOnSuccessListener {
             run {
                 Toast.makeText(context, "Distress Reported", Toast.LENGTH_SHORT).show()
-                (context as MainActivity).addAnnotationToMap(longitude = location.longitude, latitude = location.latitude, resourceId)
-//                (context as MainActivity).getDistresses()
+//                (context as MainActivity).addAnnotationToMap(longitude = location.longitude, latitude = location.latitude, resourceId)
+                (context as MainActivity).getDistresses()
                 dismiss()
             }
         }

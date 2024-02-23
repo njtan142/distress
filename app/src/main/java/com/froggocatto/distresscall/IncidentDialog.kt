@@ -13,63 +13,134 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.cardview.widget.CardView
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 
-class IncidentDialog(private val c: Activity, private val context:Context) : Dialog(c), View.OnClickListener {
+class IncidentDialog(
+    private val c: Activity,
+    private val context: Context,
+    private val id: String
+) : Dialog(c), View.OnClickListener {
     lateinit var cardView: CardView
+    lateinit var imageView: ImageView
+    lateinit var distressView: TextView
+    lateinit var nameView: TextView
+    lateinit var contactView: TextView
+    lateinit var locationView: TextView
+    lateinit var timeView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.distress_call_dialog)
-        cardView = findViewById<CardView>(R.id.distress_cardview)
+        setContentView(R.layout.incident_dialog)
+        getViews()
+        expandDialog()
+        getData()
+    }
+
+    private fun getViews() {
+        cardView = findViewById(R.id.incident_cardview)
+        imageView = findViewById(R.id.incident_imageview)
+        distressView = findViewById(R.id.incident_distress_name)
+        nameView = findViewById(R.id.incident_reporter_name)
+        contactView = findViewById(R.id.incident_reporter_contact)
+        locationView = findViewById(R.id.incident_marker_location)
+        timeView = findViewById(R.id.incident_time_passed)
+    }
+
+    private fun expandDialog() {
         val layoutParams = cardView.layoutParams
         layoutParams.width = (getScreenWidth() * 0.8).toInt()
         layoutParams.height = (getScreenHeight() * 0.8).toInt()
-        window?.setBackgroundDrawable( ColorDrawable(Color.TRANSPARENT))
-        setListeners()
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
-    private fun setListeners() {
-        findViewById<Button>(R.id.distress_fire_button).setOnClickListener {
-            run {
-                findViewById<Button>(R.id.distress_fire_button).isEnabled = false;
-                reportDistress("Fire", R.drawable.fire_symbol)
+    private fun getData() {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("distresses").document(id).get()
+            .addOnSuccessListener {
+                run {
+                    val data = it.data!!
+                    val userID = data["reporter"].toString()
+                    Toast.makeText(context, userID, Toast.LENGTH_SHORT).show()
+                    db.collection("users").document(userID).get()
+                        .addOnSuccessListener {
+                            run {
+                                val user = it.data
+                                if(user == null){
+                                    Toast.makeText(context, "User is null", Toast.LENGTH_SHORT).show()
+                                    return@addOnSuccessListener
+                                }
+                                setViews(data, user)
+                            }
+                        }
+                }
+            }
+    }
+
+    private fun setViews(distressData: Map<String, Any>, userData: Map<String, Any>) {
+        val distress = distressData["distress"].toString()
+        val name = userData["name"].toString()
+        val contact = userData["phone"].toString()
+        val timestamp = distressData["timestamp"] as Timestamp
+        val longitude = (distressData["longitude"] as Double)
+        val latitude = (distressData["latitude"] as Double)
+
+        distressView.text = distress
+        nameView.text = name
+        contactView.text = contact
+        timeView.text = getTimePassed(timestamp)
+        locationView.text = getFormattedLocation(latitude, longitude)
+
+        val resourceId = when (distress) {
+            "Fire" -> R.drawable.fire_symbol
+            "Crime" -> R.drawable.crime
+            "Accident" -> R.drawable.accident_symbol
+            "Earthquake" -> R.drawable.earthquake
+            else -> {
+                R.drawable.other_symbol
             }
         }
-        findViewById<Button>(R.id.distress_accident_button).setOnClickListener {
-            run {
-                findViewById<Button>(R.id.distress_accident_button).isEnabled = false;
-                reportDistress("Accident", R.drawable.accident_symbol)
+
+        imageView.setImageResource(resourceId)
+    }
+
+    private fun getTimePassed(timestamp: Timestamp): String {
+        val currentTime = Timestamp.now()
+        val elapsedTimeInSeconds = currentTime.seconds - timestamp.seconds
+
+        return when {
+            elapsedTimeInSeconds >= 3600 -> {
+                val hours = elapsedTimeInSeconds / 3600
+                "$hours hours ago"
             }
-        }
-        findViewById<Button>(R.id.distress_earthquake_button).setOnClickListener {
-            run {
-                findViewById<Button>(R.id.distress_earthquake_button).isEnabled = false;
-                reportDistress("Earthquake", R.drawable.earthquake)
+            elapsedTimeInSeconds >= 60 -> {
+                val minutes = elapsedTimeInSeconds / 60
+                "$minutes minutes ago"
             }
-        }
-        findViewById<Button>(R.id.distress_crime_button).setOnClickListener {
-            run {
-                findViewById<Button>(R.id.distress_crime_button).isEnabled = false;
-                reportDistress("Crime", R.drawable.crime)
-            }
+            else -> "$elapsedTimeInSeconds seconds ago"
         }
     }
 
+    private fun getFormattedLocation(latitude: Double, longitude: Double): String {
+        val latDegrees = latitude.toInt()
+        val latMinutes = ((latitude - latDegrees) * 60).toInt()
+        val latSeconds = ((latitude - latDegrees - latMinutes / 60.0) * 3600).toInt()
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
+        val lonDegrees = longitude.toInt()
+        val lonMinutes = ((longitude - lonDegrees) * 60).toInt()
+        val lonSeconds = ((longitude - lonDegrees - lonMinutes / 60.0) * 3600).toInt()
 
-
-        }
+        return "$latDegrees°$latMinutes'$latSeconds\"N $lonDegrees°$lonMinutes'$lonSeconds\"E"
     }
+
 
     private fun getScreenWidth(): Int {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -77,6 +148,7 @@ class IncidentDialog(private val c: Activity, private val context:Context) : Dia
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         return displayMetrics.widthPixels
     }
+
     private fun getScreenHeight(): Int {
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val displayMetrics = DisplayMetrics()
@@ -84,51 +156,9 @@ class IncidentDialog(private val c: Activity, private val context:Context) : Dia
         return displayMetrics.heightPixels
     }
 
-    override fun onClick(v: View) {
-
-    }
-
-    override fun show() {
-        super.show()
-    }
-
-    private fun getCurrentLocation() : Location? {
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        try {
-            val location: Location? =
-                locationManager.getLastKnownLocation(LocationManager.FUSED_PROVIDER)
-            if (location != null) {
-                return location
-            } else {
-                return null
-            }
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-            return null
-        }
+    override fun onClick(v: View?) {
+        TODO("Not yet implemented")
     }
 
 
-
-    private fun reportDistress(distress:String, @DrawableRes resourceId: Int) {
-        val db = FirebaseFirestore.getInstance()
-        val colRef = db.collection("distresses")
-        val location = getCurrentLocation() ?: return;
-        val data = mapOf(
-            "latitude" to location.latitude,
-            "longitude" to location.longitude,
-            "distress" to distress,
-            "timestamp" to FieldValue.serverTimestamp(),
-        )
-        (context as MainActivity).sendFCMMessage(distress)
-
-        colRef.document().set(data).addOnSuccessListener {
-            run {
-                Toast.makeText(context, "Distress Reported", Toast.LENGTH_SHORT).show()
-                (context as MainActivity).addAnnotationToMap(longitude = location.longitude, latitude = location.latitude, resourceId)
-//                (context as MainActivity).getDistresses()
-                dismiss()
-            }
-        }
-    }
 }

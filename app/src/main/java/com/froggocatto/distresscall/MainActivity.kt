@@ -215,8 +215,10 @@ class MainActivity : AppCompatActivity() {
         getDistresses()
     }
 
-    private fun onMarkerClick(): Boolean {
+    private fun onMarkerClick(id:String): Boolean {
         Toast.makeText(this, "Marker Clicked", Toast.LENGTH_SHORT).show()
+        val dialog = IncidentDialog(this@MainActivity, this@MainActivity, id)
+        dialog.show();
         return true
     }
 
@@ -384,10 +386,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun addAnnotationToMap(
+    fun addAnnotationToMap(
         longitude: Double,
         latitude: Double,
         @DrawableRes resourceId: Int,
+        markerID:String,
         scale: Double = 1.0,
         hasRange: Boolean = false,
         rangeRadius: Int = 1000,
@@ -406,7 +409,7 @@ class MainActivity : AppCompatActivity() {
             pointAnnotationManager?.create(pointAnnotationOptions)
             pointAnnotationManager?.addClickListener(
                 OnPointAnnotationClickListener {
-                    onMarkerClick()
+                    onMarkerClick(markerID)
                 }
             )
 
@@ -495,6 +498,7 @@ class MainActivity : AppCompatActivity() {
                         data["longitude"].toString().toDouble(),
                         data["latitude"].toString().toDouble(),
                         resourceId,
+                        documentSnapshot.id,
                         zoom * scale,
                         range != 0,
                         rangeRadius = range

@@ -81,7 +81,7 @@ class Register : AppCompatActivity() {
             "gender" to genderSelect.selectedItem.toString(),
         )
 
-        colref.document().set(data).addOnSuccessListener {
+        colref.document(uid).set(data).addOnSuccessListener {
             run {
                 setAuthDisplayName(data.get("name").toString())
             }
