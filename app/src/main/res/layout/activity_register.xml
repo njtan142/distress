@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Register"
+    tools:layout_editor_absoluteX="25dp"
+    tools:layout_editor_absoluteY="0dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/password_input"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:hint="*minimum of 8 letters/numbers"
+                android:inputType="textPassword"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/email_input"
+                app:layout_constraintStart_toStartOf="@+id/email_input"
+                app:layout_constraintTop_toBottomOf="@+id/email_input" />
+
+            <EditText
+                android:id="@+id/age_input"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:hint="e.g. 20"
+                android:inputType="number"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/name_input"
+                app:layout_constraintStart_toStartOf="@+id/name_input"
+                app:layout_constraintTop_toBottomOf="@+id/name_input" />
+
+            <EditText
+                android:id="@+id/email_input"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:hint="e.g. hello123@gmail.com"
+                android:inputType="textEmailAddress"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/address_input"
+                app:layout_constraintStart_toStartOf="@+id/address_input"
+                app:layout_constraintTop_toBottomOf="@+id/phone_input" />
+
+            <Spinner
+                android:id="@+id/gender_spinner"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="11dp"
+                android:background="@drawable/border"
+                android:entries="@array/gender_Options"
+                app:layout_constraintEnd_toEndOf="@+id/age_input"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/age_input"
+                app:layout_constraintTop_toBottomOf="@+id/age_input" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="43dp"
+                android:text="Full Name:"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/name_input"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/name_input" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Age:"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/age_input"
+                app:layout_constraintEnd_toEndOf="@+id/textView8"
+                app:layout_constraintTop_toTopOf="@+id/age_input" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="11dp"
+                android:layout_marginBottom="8dp"
+                android:text="Email Address:"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/email_input"
+                app:layout_constraintEnd_toEndOf="@+id/textView7"
+                app:layout_constraintTop_toTopOf="@+id/email_input" />
+
+            <Button
+                android:id="@+id/register_submit_button"
+                android:layout_width="220dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="75dp"
+                android:text="Submit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/confirm_password_input" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="2dp"
+                android:text="Gender:"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/gender_spinner"
+                app:layout_constraintEnd_toEndOf="@+id/textView5"
+                app:layout_constraintTop_toTopOf="@+id/gender_spinner" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="9dp"
+                android:layout_marginBottom="12dp"
+                android:text="Password:"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/password_input"
+                app:layout_constraintEnd_toEndOf="@+id/textView4"
+                app:layout_constraintTop_toTopOf="@+id/password_input" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address:"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/address_input"
+                app:layout_constraintEnd_toEndOf="@+id/textView6"
+                app:layout_constraintTop_toTopOf="@+id/address_input" />
+
+            <EditText
+                android:id="@+id/name_input"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="36dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:hint="e.g. Jhon"
+                android:inputType="text"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/textView8"
+                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="78dp"
+                android:layout_height="39dp"
+                android:layout_marginBottom="4dp"
+                android:text="Confirm Password:"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/confirm_password_input"
+                app:layout_constraintEnd_toEndOf="@+id/textView9"
+                app:layout_constraintTop_toTopOf="@+id/confirm_password_input" />
+
+            <EditText
+                android:id="@+id/address_input"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:hint="e.g. Cebu City"
+                android:inputType="textPostalAddress"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/gender_spinner"
+                app:layout_constraintStart_toStartOf="@+id/age_input"
+                app:layout_constraintTop_toBottomOf="@+id/gender_spinner" />
+
+            <EditText
+                android:id="@+id/confirm_password_input"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:hint="*minimum of 8 letters/numbers"
+                android:inputType="textPassword"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/password_input"
+                app:layout_constraintStart_toStartOf="@+id/password_input"
+                app:layout_constraintTop_toBottomOf="@+id/password_input" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="68dp"
+                android:fontFamily="sans-serif-condensed"
+                android:text="Create Account"
+                android:textSize="40sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone Number"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/phone_input"
+                app:layout_constraintEnd_toEndOf="@+id/textView7"
+                app:layout_constraintTop_toTopOf="@+id/phone_input" />
+
+            <EditText
+                android:id="@+id/phone_input"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:hint="09123456789"
+                android:inputType="phone"
+                app:layout_constraintEnd_toEndOf="@+id/address_input"
+                app:layout_constraintHorizontal_bias="0.418"
+                app:layout_constraintStart_toStartOf="@+id/address_input"
+                app:layout_constraintTop_toBottomOf="@+id/address_input" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

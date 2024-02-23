@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Distress</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string-array name="gender_Options">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Non-binary</item>
+    </string-array>
+</resources>

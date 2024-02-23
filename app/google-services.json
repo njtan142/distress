@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "366904400653",
+    "project_id": "distress-628b5",
+    "storage_bucket": "distress-628b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:366904400653:android:b55c72ec77ba59bec7ee44",
+        "android_client_info": {
+          "package_name": "com.froggocatto.distresscall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAh7BoZh4xgmXoBsO2zbeoH3sTqUh6KlL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
