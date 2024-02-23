@@ -94,25 +94,21 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult? ->
         if (isLocationEnabled()) {
-
+            goToLocation()
         } else {
             Toast.makeText(this, "Location is still not enabled.", Toast.LENGTH_SHORT).show()
         }
     }
 
-    val locationObserver = object : LocationObserver {
-        override fun onLocationUpdateReceived(locations: MutableList<Location>) {
-            Log.e("location", "Location update received: " + locations)
-        }
-    }
 
     var permissionsListener: PermissionsListener = object : PermissionsListener {
         override fun onExplanationNeeded(permissionsToExplain: List<String>) {
-            goToLocation()
+            Toast.makeText(this@MainActivity, "explanation needed", Toast.LENGTH_SHORT).show()
         }
 
         override fun onPermissionResult(granted: Boolean) {
             if (granted) {
+                goToLocation()
             } else {
             }
         }
@@ -121,10 +117,14 @@ class MainActivity : AppCompatActivity() {
     private fun askNotificationPermission() {
         // This is only necessary for API level >= 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) ==
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) ==
                 PackageManager.PERMISSION_GRANTED
             ) {
                 // FCM SDK (and your app) can post notifications.
+                startBackgroundService()
             } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
                 // TODO: display an educational UI explaining to the user the features that will be enabled
                 //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // FCM SDK (and your app) can post notifications.
+            startBackgroundService()
         } else {
             // TODO: Inform user that that your app will not show notifications.
         }
@@ -172,13 +172,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (!checkLoggedIn()) {
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
             finish()
+            return
         }
-
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
@@ -188,19 +187,15 @@ class MainActivity : AppCompatActivity() {
                 Log.e("FCM Token", "Error getting token", task.exception)
             }
         }
-
         setContentView(R.layout.activity_main)
         initializeMapBox()
         mapView.camera.addCameraZoomChangeListener(
             CameraAnimatorChangeListener {
-//                Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_LONG).show()
                 val scalingFactor = 2.0.pow(it - 6.0)
                 zoom = 0.0005 * scalingFactor
                 onZoomChanged(0.0005 * scalingFactor)
             }
         )
-//        mapView?.annotations?.createPointAnnotationManager()?
-
         setListeners()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
@@ -217,10 +212,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             startBackgroundService()
         }
-
         getDistresses()
-
-
     }
 
     private fun onMarkerClick(): Boolean {
@@ -245,6 +237,7 @@ class MainActivity : AppCompatActivity() {
             startService(serviceIntent)
         }
     }
+
     private fun isServiceRunning(serviceClass: Class<*>): Boolean {
         val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (service in manager.getRunningServices(Int.MAX_VALUE)) {
@@ -258,7 +251,6 @@ class MainActivity : AppCompatActivity() {
     private fun initializeMapBox() {
         MapboxOptions.accessToken =
             "sk.eyJ1Ijoibmp0YW4xNDIiLCJhIjoiY2xzOXR4eWxkMDE1MjJxcGRnZDZ6bTJjNCJ9.k372nNxCVyFcEuLpdpWCoA"
-
         mapView = findViewById(R.id.mapView)
         mapView.mapboxMap.setCamera(
             CameraOptions.Builder()
@@ -269,27 +261,22 @@ class MainActivity : AppCompatActivity() {
                 .build()
         )
         mapView.mapboxMap.loadStyle(Style.SATELLITE)
-
         permissionsManager = PermissionsManager(permissionsListener)
         askNotificationPermission()
+    }
+
+    private fun getLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
+            Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
+            if (isLocationEnabled()) {
+                goToLocation()
+            } else {
+                showEnableLocationDialog();
+            }
         } else {
             permissionsManager.requestLocationPermissions(this)
         }
 
-        val coroutineScope = CoroutineScope(Dispatchers.Main)
-        coroutineScope.launch {
-            delay(1000)
-            getLocation()
-        }
-    }
-
-    private fun getLocation() {
-        if (isLocationEnabled()) {
-            goToLocation()
-        } else {
-            showEnableLocationDialog();
-        }
     }
 
     private fun goToLocation() {
@@ -303,7 +290,6 @@ class MainActivity : AppCompatActivity() {
                 zoom(16.0)
                 pitch(0.0)
                 bearing(0.0)
-
             }
             mapboxMap.flyTo(target, mapAnimationOptions {
                 duration(3_000)
@@ -432,8 +418,9 @@ class MainActivity : AppCompatActivity() {
                     .withCircleRadius(rangeRadius * zoom)
                     .withCircleColor("#ee0000")
                     .withCircleOpacity(0.2)
-                .withCircleStrokeWidth(2.0)
-                .withCircleStrokeColor("#ffffff")
+                    .withCircleStrokeWidth(2.0)
+                    .withCircleStrokeColor("#ff0033")
+                    .withCircleStrokeOpacity(0.5)
                 circleAnnotationManager?.create(circleAnnotationOptions)
             }
 
@@ -503,7 +490,7 @@ class MainActivity : AppCompatActivity() {
                         0
                     }
                 }
-                if (secondsDifference <= 2 * 60 ) {
+                if (secondsDifference <= 2 * 60 * 60) {
                     addAnnotationToMap(
                         data["longitude"].toString().toDouble(),
                         data["latitude"].toString().toDouble(),
