@@ -67,6 +67,13 @@ class BackgroundService : Service() {
     }
 
     fun generateNotification(title: String, message: String) {
+        val notificationId = 0
+
+        // Check if notification with ID 0 is already active
+        if (isNotificationActive(notificationId)) {
+            // Remove the existing notification
+            removeNotification(notificationId)
+        }
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
@@ -113,7 +120,6 @@ class BackgroundService : Service() {
         val colRef = db.collection("distresses");
         listener = colRef.addSnapshotListener { snapshot, e ->
             if (e != null) {
-                // Handle errors
                 return@addSnapshotListener
             }
             if (snapshot != null) {
@@ -130,5 +136,26 @@ class BackgroundService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         listener.remove()
+    }
+
+    fun removeNotification(notificationId: Int) {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(notificationId)
+    }
+
+    fun isNotificationActive(notificationId: Int): Boolean {
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val activeNotifications = notificationManager.activeNotifications
+
+        for (notification in activeNotifications) {
+            if (notification.id == notificationId) {
+                return true
+            }
+        }
+
+        return false
     }
 }

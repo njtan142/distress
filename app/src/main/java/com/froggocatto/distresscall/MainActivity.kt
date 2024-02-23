@@ -436,18 +436,12 @@ class MainActivity : AppCompatActivity() {
                     .withCircleRadius(rangeRadius * zoom)
                     .withCircleColor("#ee0000")
                     .withCircleOpacity(0.2)
-//                .withCircleStrokeWidth(2.0)
-//                .withCircleStrokeColor("#ffffff")
+                .withCircleStrokeWidth(2.0)
+                .withCircleStrokeColor("#ffffff")
                 circleAnnotationManager?.create(circleAnnotationOptions)
             }
 
         }
-    }
-
-
-    private fun resetMarkers() {
-        val annotationApi = mapView?.annotations
-        annotationApi?.cleanup()
     }
 
 
@@ -481,14 +475,11 @@ class MainActivity : AppCompatActivity() {
             for (documentSnapshot in documents!!) {
                 val data = documentSnapshot.data!!
                 val type = data["distress"].toString()
-
                 var timestamp = 0L
                 if (data["timestamp"] != null) {
                     timestamp = (data["timestamp"] as Timestamp).seconds
                 }
-//                val hoursDifference = TimeUnit.MILLISECONDS.toHours(currentTime - timestamp)
                 val secondsDifference = currentTime.seconds - timestamp
-
                 val resourceId = when (type) {
                     "Fire" -> R.drawable.fire_symbol
                     "Crime" -> R.drawable.crime
@@ -516,8 +507,6 @@ class MainActivity : AppCompatActivity() {
                         0
                     }
                 }
-//                Toast.makeText(this@MainActivity, secondsDifference.toString(), Toast.LENGTH_SHORT)
-//                    .show()
                 if (secondsDifference <= 2 * 60 ) {
                     addAnnotationToMap(
                         data["longitude"].toString().toDouble(),
@@ -533,68 +522,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun renderMarkers() {
-
-    }
 
     fun getDistresses() {
         mapView?.annotations?.cleanup()
         val db = FirebaseFirestore.getInstance()
         val colRef = db.collection("distresses");
-//        colRef.get().addOnCompleteListener { task ->
-//            run {
-//                val snapshot = task.result
-//                documents = snapshot.documents
-//                for (documentSnapshot in documents!!) {
-//                    val data = documentSnapshot.data!!
-//                    val type = data["distress"].toString()
-//                    val resourceId = when (type) {
-//                        "Fire" -> R.drawable.fire_symbol
-//                        "Crime" -> R.drawable.crime
-//                        "Accident" -> R.drawable.accident_symbol
-//                        "Earthquake" -> R.drawable.earthquake
-//                        else -> {
-//                            R.drawable.other_symbol
-//                        }
-//                    }
-//
-//                    addAnnotationToMap(
-//                        data["longitude"].toString().toDouble(),
-//                        data["latitude"].toString().toDouble(),
-//                        resourceId
-//                    )
-//                }
-//            }
-//        }
         val listener = colRef.addSnapshotListener { snapshot, e ->
             if (e != null) {
-                // Handle errors
                 return@addSnapshotListener
             }
-
             if (snapshot != null) {
-                // Clear existing annotations
                 mapView?.annotations?.cleanup()
                 documents = snapshot.documents
                 onZoomChanged(zoom)
-                // Process new data
-//                for (documentSnapshot in snapshot.documents) {
-//                    val data = documentSnapshot.data!!
-//                    val type = data["distress"].toString()
-//                    val resourceId = when (type) {
-//                        "Fire" -> R.drawable.fire_symbol
-//                        "Crime" -> R.drawable.crime
-//                        "Accident" -> R.drawable.accident_symbol
-//                        "Earthquake" -> R.drawable.earthquake
-//                        else -> R.drawable.other_symbol
-//                    }
-//
-//                    addAnnotationToMap(
-//                        data["longitude"].toString().toDouble(),
-//                        data["latitude"].toString().toDouble(),
-//                        resourceId
-//                    )
-//                }
             }
         }
 
