@@ -6,4 +6,10 @@
         <item>Female</item>
         <item>Non-binary</item>
     </string-array>
+    <string-array name="timeline_options">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+        <item>Year</item>
+    </string-array>
 </resources>

@@ -13,9 +13,12 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import android.view.animation.Interpolator
+import android.widget.AdapterView
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -79,7 +82,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 import kotlin.time.Duration.Companion.seconds
 
-class MainActivity : AppCompatActivity() {
+class TimelineActivity : AppCompatActivity() {
     private lateinit var mapView: MapView
     lateinit var permissionsManager: PermissionsManager
     private val REQUEST_ENABLE_LOCATION = 123;
@@ -89,6 +92,8 @@ class MainActivity : AppCompatActivity() {
     private var listener: ListenerRegistration? = null
     var zoom: Double = 6.0;
     private lateinit var fcmToken: String
+
+    private lateinit var timelineSpinner: Spinner
 
     private val enableLocationLauncher = registerForActivityResult<Intent, ActivityResult>(
         ActivityResultContracts.StartActivityForResult()
@@ -103,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
     var permissionsListener: PermissionsListener = object : PermissionsListener {
         override fun onExplanationNeeded(permissionsToExplain: List<String>) {
-            Toast.makeText(this@MainActivity, "explanation needed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@TimelineActivity, "explanation needed", Toast.LENGTH_SHORT).show()
         }
 
         override fun onPermissionResult(granted: Boolean) {
@@ -123,8 +128,6 @@ class MainActivity : AppCompatActivity() {
                 ) ==
                 PackageManager.PERMISSION_GRANTED
             ) {
-                // FCM SDK (and your app) can post notifications.
-                startBackgroundService()
             } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
                 // TODO: display an educational UI explaining to the user the features that will be enabled
                 //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
@@ -141,113 +144,34 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         if (isGranted) {
-            startBackgroundService()
         } else {
             // TODO: Inform user that that your app will not show notifications.
         }
     }
 
-    fun sendFCMMessage(message: String) {
-        Thread {
-            try {
-                // Construct the FCM message
-                val message = mapOf(
-                    "to" to fcmToken,
-                    "title" to "Your Notification Title",
-                    "body" to message
-                )
-
-                // Send the FCM message
-                val response = FirebaseMessaging.getInstance().send(
-                    RemoteMessage.Builder(fcmToken).setData(message).build()
-                )
-
-                // Log the message ID and response
-                Log.d("FCM Message", "Successfully sent message: $response")
-            } catch (e: Exception) {
-                Log.e("FCM Message", "Error sending message", e)
-            }
-        }.start()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!checkLoggedIn()) {
-            val intent = Intent(this, Login::class.java)
-            startActivity(intent)
-            finish()
-            return
-        }
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val token = task.result
-                Log.d("FCM Token", "Token: $token")
-                fcmToken = token
-            } else {
-                Log.e("FCM Token", "Error getting token", task.exception)
-            }
-        }
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_timeline)
+        timelineSpinner = findViewById(R.id.timeline_spinner)
         initializeMapBox()
         mapView.camera.addCameraZoomChangeListener(
             CameraAnimatorChangeListener {
                 val scalingFactor = 2.0.pow(it - 6.0)
                 zoom = 0.0005 * scalingFactor
-                onZoomChanged(0.0005 * scalingFactor)
+                onZoomChanged(1.0)
             }
         )
         setListeners()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-            ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.FOREGROUND_SERVICE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.FOREGROUND_SERVICE),
-                NOTIFICATION_PERMISSION_CODE
-            )
-        } else {
-            startBackgroundService()
-        }
         getDistresses()
+
     }
 
-    private fun onMarkerClick(id:String): Boolean {
+    private fun onMarkerClick(id: String): Boolean {
         Toast.makeText(this, "Marker Clicked", Toast.LENGTH_SHORT).show()
-        val dialog = IncidentDialog(this@MainActivity, this@MainActivity, id)
+        val dialog = IncidentDialog(this@TimelineActivity, this@TimelineActivity, id)
         dialog.show();
         return true
-    }
-
-    private fun checkLoggedIn(): Boolean {
-        val auth = FirebaseAuth.getInstance()
-        if (auth.currentUser != null) {
-            return true
-        }
-        return false
-    }
-
-
-    private fun startBackgroundService() {
-        val serviceIntent = Intent(this, BackgroundService::class.java)
-        // Check if BackgroundService is already running
-        if (!isServiceRunning(BackgroundService::class.java)) {
-            Toast.makeText(this, "Service started", Toast.LENGTH_SHORT).show()
-            startService(serviceIntent)
-        }
-    }
-
-    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
-        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-            if (serviceClass.name == service.service.className) {
-                return true
-            }
-        }
-        return false
     }
 
     private fun initializeMapBox() {
@@ -300,12 +224,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    val CUSTOM_INTERPOLATOR: Interpolator = PathInterpolatorCompat.create(
-        1.0f,
-        0.27f,
-        0.68f,
-        1.25f
-    )
     val CUSTOM_INTERPOLATOR2: Interpolator = PathInterpolatorCompat.create(
         0.16f,
         -0.38f,
@@ -313,9 +231,10 @@ class MainActivity : AppCompatActivity() {
         1.46f
     )
 
+
     private fun getCurrentLocation(): android.location.Location? {
         val locationManager =
-            this@MainActivity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            this@TimelineActivity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         try {
             val location: android.location.Location? =
                 locationManager.getLastKnownLocation(LocationManager.FUSED_PROVIDER)
@@ -331,23 +250,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setListeners() {
-        findViewById<Button>(R.id.distress_call_button).setOnClickListener {
-            run {
-//                resetMarkers()
-                val dialog = DistressDialog(this@MainActivity, this@MainActivity)
-                dialog.show();
-
-            }
-        }
         findViewById<ImageButton>(R.id.my_location_button).setOnClickListener {
             run {
                 getLocation()
             }
         }
-        findViewById<ImageButton>(R.id.profile_button).setOnClickListener {
-            run {
-                val intent = Intent(this, ProfileActivity::class.java)
-                startActivity(intent)
+        timelineSpinner.selected {
+            onZoomChanged(1.0)
+        }
+    }
+
+    fun Spinner.selected(action: (position:Int) -> Unit) {
+        this.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                action(position)
             }
         }
     }
@@ -379,7 +296,6 @@ class MainActivity : AppCompatActivity() {
             grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED
         ) {
-            startBackgroundService()
         }
     }
 
@@ -387,13 +303,13 @@ class MainActivity : AppCompatActivity() {
         longitude: Double,
         latitude: Double,
         @DrawableRes resourceId: Int,
-        markerID:String,
+        markerID: String,
         scale: Double = 1.0,
         hasRange: Boolean = false,
         rangeRadius: Int = 1000,
     ) {
         bitmapFromDrawableRes(
-            this@MainActivity,
+            this@TimelineActivity,
             resourceId
         )?.let {
             val annotationApi = mapView?.annotations
@@ -472,15 +388,7 @@ class MainActivity : AppCompatActivity() {
                         R.drawable.other_symbol
                     }
                 }
-                val scale = when (type) {
-                    "Fire" -> 1.0
-                    "Crime" -> 0.4
-                    "Accident" -> 0.5
-                    "Earthquake" -> 1.5
-                    else -> {
-                        0.01
-                    }
-                }
+                val scale = 1
                 val range = when (type) {
                     "Fire" -> 300
                     "Crime" -> 0
@@ -490,15 +398,22 @@ class MainActivity : AppCompatActivity() {
                         0
                     }
                 }
-                if (secondsDifference <= 2 * 60 * 60) {
+                val limit = when (timelineSpinner.selectedItem.toString()) {
+                    "Day" -> 24 * 60 * 60
+                    "Week" -> 7 * 24 * 60 * 60
+                    "Month" -> 30 * 24 * 60 * 60
+                    "Year" -> 365 * 24 * 60 * 60
+                    else -> {
+                        24 * 60 * 60
+                    }
+                }
+                if (secondsDifference <= limit) {
                     addAnnotationToMap(
                         data["longitude"].toString().toDouble(),
                         data["latitude"].toString().toDouble(),
                         resourceId,
                         documentSnapshot.id,
-                        zoom * scale,
-                        range != 0,
-                        rangeRadius = range
+                        0.6
                     )
                 }
 

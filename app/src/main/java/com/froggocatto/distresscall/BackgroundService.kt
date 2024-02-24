@@ -121,7 +121,8 @@ class BackgroundService : Service() {
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                generateNotification("Alert!!!", "New messages")
+                Toast.makeText(this, "Changes", Toast.LENGTH_SHORT).show()
+                generateNotification("Distress Alert!!!", "Incident happened, check to see if its nearby")
             }
         }
 
