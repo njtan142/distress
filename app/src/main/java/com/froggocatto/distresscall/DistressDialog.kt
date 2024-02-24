@@ -126,7 +126,7 @@ class DistressDialog(private val c: Activity, private val context:Context) : Dia
 
         colRef.document().set(data).addOnSuccessListener {
             run {
-                Toast.makeText(context, "Distress Reported", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "Distress Reported", Toast.LENGTH_SHORT).show()
 //                (context as MainActivity).addAnnotationToMap(longitude = location.longitude, latitude = location.latitude, resourceId)
                 (context as MainActivity).getDistresses()
                 dismiss()

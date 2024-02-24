@@ -96,14 +96,14 @@ class MainActivity : AppCompatActivity() {
         if (isLocationEnabled()) {
             goToLocation()
         } else {
-            Toast.makeText(this, "Location is still not enabled.", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "Location is still not enabled.", Toast.LENGTH_SHORT).show()
         }
     }
 
 
     var permissionsListener: PermissionsListener = object : PermissionsListener {
         override fun onExplanationNeeded(permissionsToExplain: List<String>) {
-            Toast.makeText(this@MainActivity, "explanation needed", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this@MainActivity, "explanation needed", Toast.LENGTH_SHORT).show()
         }
 
         override fun onPermissionResult(granted: Boolean) {
@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onMarkerClick(id:String): Boolean {
-        Toast.makeText(this, "Marker Clicked", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(this, "Marker Clicked", Toast.LENGTH_SHORT).show()
         val dialog = IncidentDialog(this@MainActivity, this@MainActivity, id)
         dialog.show();
         return true
@@ -235,7 +235,7 @@ class MainActivity : AppCompatActivity() {
         val serviceIntent = Intent(this, BackgroundService::class.java)
         // Check if BackgroundService is already running
         if (!isServiceRunning(BackgroundService::class.java)) {
-            Toast.makeText(this, "Service started", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "Service started", Toast.LENGTH_SHORT).show()
             startService(serviceIntent)
         }
     }
@@ -269,7 +269,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
-            Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
             if (isLocationEnabled()) {
                 goToLocation()
             } else {
@@ -358,11 +358,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showEnableLocationDialog() {
-        Toast.makeText(
-            this,
-            "Location is not enabled. Please enable it in settings.",
-            Toast.LENGTH_SHORT
-        ).show()
+//        Toast.makeText(
+//            this,
+//            "Location is not enabled. Please enable it in settings.",
+//            Toast.LENGTH_SHORT
+//        ).show()
 
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         enableLocationLauncher.launch(intent)

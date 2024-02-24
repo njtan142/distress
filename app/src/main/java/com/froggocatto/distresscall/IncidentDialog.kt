@@ -69,13 +69,13 @@ class IncidentDialog(
                 run {
                     val data = it.data!!
                     val userID = data["reporter"].toString()
-                    Toast.makeText(context, userID, Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, userID, Toast.LENGTH_SHORT).show()
                     db.collection("users").document(userID).get()
                         .addOnSuccessListener {
                             run {
                                 val user = it.data
                                 if(user == null){
-                                    Toast.makeText(context, "User is null", Toast.LENGTH_SHORT).show()
+//                                    Toast.makeText(context, "User is null", Toast.LENGTH_SHORT).show()
                                     return@addOnSuccessListener
                                 }
                                 setViews(data, user)
