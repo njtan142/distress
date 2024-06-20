@@ -108,7 +108,6 @@ class TimelineActivity : AppCompatActivity() {
 
     var permissionsListener: PermissionsListener = object : PermissionsListener {
         override fun onExplanationNeeded(permissionsToExplain: List<String>) {
-            Toast.makeText(this@TimelineActivity, "explanation needed", Toast.LENGTH_SHORT).show()
         }
 
         override fun onPermissionResult(granted: Boolean) {
@@ -168,7 +167,6 @@ class TimelineActivity : AppCompatActivity() {
     }
 
     private fun onMarkerClick(id: String): Boolean {
-        Toast.makeText(this, "Marker Clicked", Toast.LENGTH_SHORT).show()
         val dialog = IncidentDialog(this@TimelineActivity, this@TimelineActivity, id)
         dialog.show();
         return true
@@ -193,7 +191,6 @@ class TimelineActivity : AppCompatActivity() {
 
     private fun getLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
-            Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
             if (isLocationEnabled()) {
                 goToLocation()
             } else {
@@ -431,7 +428,7 @@ class TimelineActivity : AppCompatActivity() {
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                mapView?.annotations?.cleanup()
+                mapView.annotations.cleanup()
                 documents = snapshot.documents
                 onZoomChanged(zoom)
             }

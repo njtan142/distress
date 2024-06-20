@@ -1,0 +1,42 @@
+
+Qkotlin:S1172_"9Use "_" instead of this unused lambda parameter "result".(…Íö²
+Ukotlin:S6619Ç"<Remove this useless null-safe access ?., it always succeeds.(†ùÀ­
+Ukotlin:S6619ÿ"<Remove this useless null-safe access ?., it always succeeds.(†ùÀ­
+Pkotlin:S6619å"7Remove this useless non-null check, it always succeeds.(²şÎõ
+Ukotlin:S6619"<Remove this useless null-safe access ?., it always succeeds.(ëÚŒÇ
+Ukotlin:S6619‡"<Remove this useless null-safe access ?., it always succeeds.(†ùÀ­
+;kotlin:S125c"Remove this commented out code.(…¾§åÿÿÿÿÿ
+6kotlin:S125j"Remove this commented out code.(Ù´¼Š
+<kotlin:S125Û"Remove this commented out code.(ß°»ïúÿÿÿÿ
+<kotlin:S125î"Remove this commented out code.(ãï™÷ÿÿÿÿÿ
+7kotlin:S125"Remove this commented out code.(ñ—Äº
+<kotlin:S125é"Remove this commented out code.(ŒÊ†Áıÿÿÿÿ
+@kotlin:S108p")Either remove or fill this block of code.(å¥‡
+Pkotlin:S1135"2Complete the task associated to this TODO comment.(¬¸İöûÿÿÿÿ
+Jkotlin:S1135’"2Complete the task associated to this TODO comment.(Ã’´g
+Fkotlin:S1481‚"-Remove this unused "listener" local variable.(ŒœºÒ
+2kotlin:S1128"Remove this unused import.(´Ùí
+7kotlin:S1128"Remove this unused import.(Åªõîıÿÿÿÿ
+7kotlin:S1128"Remove this unused import.(ÂÑ•úÿÿÿÿ
+7kotlin:S1128%"Remove this unused import.(¤¬Œëûÿÿÿÿ
+7kotlin:S1128)"Remove this unused import.(º¬¦Õşÿÿÿÿ
+7kotlin:S1128*"Remove this unused import.(—ê°îşÿÿÿÿ
+2kotlin:S1128."Remove this unused import.(Ûİø‚
+2kotlin:S11282"Remove this unused import.(ó»š
+7kotlin:S11283"Remove this unused import.(ç¼ç¿şÿÿÿÿ
+2kotlin:S11284"Remove this unused import.(Ÿ–úÇ
+7kotlin:S11287"Remove this unused import.(şÚ§ñùÿÿÿÿ
+7kotlin:S1128@"Remove this unused import.(ùºÃúüÿÿÿÿ
+7kotlin:S1128A"Remove this unused import.(Ôê³¨ÿÿÿÿÿ
+7kotlin:S1128B"Remove this unused import.(èãÊõûÿÿÿÿ
+7kotlin:S1128C"Remove this unused import.(Ó¸Ñÿÿÿÿÿ
+7kotlin:S1128D"Remove this unused import.(£ñ¹¸ûÿÿÿÿ
+7kotlin:S1128G"Remove this unused import.(çßÚôÿÿÿÿÿ
+7kotlin:S1128J"Remove this unused import.(ğ›ıÿÿÿÿ
+2kotlin:S1128M"Remove this unused import.(»‘Ùù
+7kotlin:S1128N"Remove this unused import.(üÎÛ øÿÿÿÿ
+2kotlin:S1128P"Remove this unused import.(ñ¹åƒ
+<kotlin:S1874¡"#Deprecated code should not be used.(°ñ¤¦
+<kotlin:S1874õ"#Deprecated code should not be used.(ÏòÑÙ
+kkotlin:S3776Æ"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(ÎŠĞÿ
+Zkotlin:S6510Â"AMove "return" statements from all branches before "if" statement.(‘¯Ú™

@@ -7,13 +7,13 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.cardview.widget.CardView
 import com.google.firebase.auth.FirebaseAuth
@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class DistressDialog(private val c: Activity, private val context:Context) : Dialog(c), View.OnClickListener {
     lateinit var cardView: CardView
+    
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,10 +67,6 @@ class DistressDialog(private val c: Activity, private val context:Context) : Dia
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-
-
-        }
     }
 
     private fun getScreenWidth(): Int {
@@ -85,9 +82,6 @@ class DistressDialog(private val c: Activity, private val context:Context) : Dia
         return displayMetrics.heightPixels
     }
 
-    override fun onClick(v: View) {
-
-    }
 
     override fun show() {
         super.show()
@@ -96,12 +90,10 @@ class DistressDialog(private val c: Activity, private val context:Context) : Dia
     private fun getCurrentLocation() : Location? {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         try {
-            val location: Location? =
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 locationManager.getLastKnownLocation(LocationManager.FUSED_PROVIDER)
-            if (location != null) {
-                return location
             } else {
-                return null
+                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
             }
         } catch (e: SecurityException) {
             e.printStackTrace()
@@ -132,5 +124,8 @@ class DistressDialog(private val c: Activity, private val context:Context) : Dia
                 dismiss()
             }
         }
+    }
+
+    override fun onClick(v: View?) {
     }
 }

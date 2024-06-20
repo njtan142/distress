@@ -10,12 +10,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.widget.RemoteViews
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.mapbox.maps.plugin.annotation.annotations
 
 class BackgroundService : Service() {
 
@@ -42,9 +39,6 @@ class BackgroundService : Service() {
             )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
-//            Toast.makeText(this, "Notification channel initialized", Toast.LENGTH_SHORT).show()
-        }else{
-//            Toast.makeText(this, "Error notif channel", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -63,7 +57,6 @@ class BackgroundService : Service() {
             .setContentIntent(pendingIntent)
             .build()
         startForeground(1, notification)
-//        Toast.makeText(this, "Foreground service started", Toast.LENGTH_SHORT).show()
     }
 
     fun generateNotification(title: String, message: String) {
@@ -121,7 +114,6 @@ class BackgroundService : Service() {
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-//                Toast.makeText(this, "Changes", Toast.LENGTH_SHORT).show()
                 generateNotification("Distress Alert!!!", "Incident happened, check to see if its nearby")
             }
         }
